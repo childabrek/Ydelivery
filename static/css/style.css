@@ -1,0 +1,12 @@
+.parent {
+    display: flex;
+}
+.image-control {
+    width: 200px;
+    height: 200px;
+}
+.text-control {
+    width: 225px;
+    font-size: 14px;
+    color: rgb(112, 112, 112);
+}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- Кнопочки меню здесь -->
+<br>
+<a href="#" class="btn btn-outline-warning">Пицца</a>
+<a href="drinks" class="btn btn-outline-warning">Напитки</a>
+<a href="drinks" class="btn btn-outline-warning">Комбо</a>
+<br>
+
+<!-- Название блока меню -->
+<h1>Пицца</h1>
+
+<!-- Позиции в меню -->
+{% for item in news%}
+<div class=".d-flex flex-row-reverse">
+    <!-- одна позиция -->
+    <div class="block">
+        <!-- Название -->
+        <h3>{{item.title}}</h3>
+        <!-- Фото -->
+        <img src="{{ item.photo }}" class="image-control">
+        <!-- Описание -->
+        <p class="text-control">{{ item.content }}</p>
+        <!-- Цена -->
+        <h4>{{ item.price }} руб.</h4>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
