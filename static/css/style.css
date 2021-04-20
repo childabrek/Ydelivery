@@ -10,3 +10,7 @@
     font-size: 14px;
     color: rgb(112, 112, 112);
 }
+
+.cont {
+    display: flex;
+}

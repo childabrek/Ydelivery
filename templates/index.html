@@ -13,8 +13,8 @@
 <h1>Пицца</h1>
 
 <!-- Позиции в меню -->
-{% for item in news%}
-<div class=".d-flex flex-row-reverse">
+<div class="cont">
+    {% for item in news%}
     <!-- одна позиция -->
     <div class="block">
         <!-- Название -->
@@ -26,6 +26,6 @@
         <!-- Цена -->
         <h4>{{ item.price }} руб.</h4>
     </div>
+    {% endfor %}
 </div>
-{% endfor %}
 {% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <br>
+    <h4 class="text-secondary">Имя пользователя:</h4>
+    <h5>{{ us.name }}</h5>
+    <h4 class="text-secondary">О себе:</h4>
+    <h5>{{ us.about }}</h5>
+    <h4 class="text-secondary">e-mail:</h4>
+    <h5>{{ us.email }}</h5>
+    <br>
+    <a href="logout" class="btn btn-danger">logout</a>
+{% endblock %}
