@@ -1,0 +1,4 @@
+Flask
+LoginManager
+sqlalchemy
+requests
