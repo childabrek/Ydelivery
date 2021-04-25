@@ -35,7 +35,8 @@ def main():
     # for p in db_sess.query(Pizza).all():
     #     print(p)
     # app.register_blueprint(jobs_api.blueprint)
-    app.run()
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
 
 
 @app.route('/logout')
