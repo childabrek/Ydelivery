@@ -1,6 +1,4 @@
 # flask
-import os
-
 from flask import Flask, render_template, redirect, request
 from flask import abort, session, url_for, make_response
 # flask_login
@@ -16,7 +14,6 @@ from data.pizza import Pizza
 from data.users import User
 from data.drinks import Drinks
 from data.combo import Combo
-from data.blank_posts import Blank
 from data.cart import Cart
 
 app = Flask(__name__)
@@ -34,9 +31,11 @@ def load_user(user_id):
 
 def main():
     db_session.global_init("db/blogs.db")
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
-    # app.run()
+    # db_sess = db_session.create_session()
+    # for p in db_sess.query(Pizza).all():
+    #     print(p)
+    # app.register_blueprint(jobs_api.blueprint)
+    app.run()
 
 
 @app.route('/logout')
@@ -122,7 +121,7 @@ def delete_cookie(valid):
 @app.route('/delete_cookie1/<valid>/<b>')
 def delete_cookie1(valid, b):
     print(valid)
-    valid = valid.replace(f'{b}', '', 1).replace('!', ' ').lstrip()
+    valid = valid.replace(f'{b}', '', 1).replace('!', ' ')
     print(valid)
     res = make_response(redirect('/cart'))
     res.set_cookie('menu_pos', valid, 60 * 60 * 24 * 15)
@@ -168,8 +167,8 @@ def cart_v():
     a = str(request.cookies.get('menu_pos', 0)).split()
     d = []
     sum1 = 0
+    print(a)
     for j in a:
-        print(j)
         if int(j[0]) == 1:
             for i in db_sess.query(Pizza).filter(Pizza.id == j[1]):
                 i.id = int('1' + str(i.id))
@@ -189,7 +188,6 @@ def cart_v():
             abort(404)
     print(d)
     print(sum1)
-    db_sess.close()
     return render_template('cart.html', cart=d, summ=sum1)
 
 
@@ -197,22 +195,7 @@ def cart_v():
 def blank_post():
     form = BlankForm()
     if form.validate_on_submit():
-        db_sess = db_session.create_session()
-        if db_sess.query(User).filter(User.name != form.name.data).first():
-            return render_template('blank.html', form=form,
-                                   message='Такого пользователя не существует')
-        print(str(form.name))
-        posts = Blank(
-            name=form.name.data,
-            street=form.street.data,
-            structure='fds',
-            house=form.house.data,
-            flat=form.flat.data,
-            phone=form.phone.data
-        )
-        db_sess.add(posts)
-        db_sess.commit()
-        return redirect('/')
+        return redirect('/cart')
     return render_template('blank.html', form=form)
 
 
