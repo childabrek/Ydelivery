@@ -1,5 +1,30 @@
 {% extends "base.html" %}
 
+
 {% block content %}
-    <h1>Success!!</h1>
+<!-- Название блока меню -->
+<h1>Корзина</h1>
+
+<!-- Позиции в меню -->
+<table>
+    {% for item in cart%}
+    <!-- одна позиция -->
+    <tr>
+        <td>{{ item.id }}</td>
+        <!-- Название -->
+        <td>{{item.title}}</td>
+        <!-- Фото -->
+        <!-- Цена -->
+        <td>{{ item.price }} руб.</td>
+        <td><a href="/delete-cookie/{{ item.id }}">
+            <img src="/static/img/arrow-down-square.svg" width="20" height="20" alt="">
+        </a></td>
+        <td><a href="/cart/{{ item.id }}">
+            <img src="/static/img/arrow-up-square.svg" width="20" height="20" alt="">
+        </a></td>
+    </tr>
+    {% endfor %}
+</table>
+<h3>{{ summ }} руб</h3>
+</div>
 {% endblock %}

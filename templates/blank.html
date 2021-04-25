@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form action="" method="post" novalidate>
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.name.label }}<br>
+        {{ form.name(class="form-control") }}<br>
+        {% for error in form.name.errors %}
+            <p class="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.phone.label }}<br>
+        {{ form.phone(class="form-control") }}<br>
+        {% for error in form.phone.errors %}
+            <p content="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+    </p>
+    <p>{{ form.street.label }}<br>
+        {{ form.street(class="form-control") }}<br>
+         {% for error in form.street.errors %}
+            <p work_size="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+    </p>
+    <p>{{ form.house.label }}<br>
+        {{ form.house(class="form-control") }}<br>
+         {% for error in form.house.errors %}
+            <p work_size="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+    </p>
+    <p>{{ form.flat.label }}<br>
+        {{ form.flat(class="form-control") }}<br>
+         {% for error in form.flat.errors %}
+            <p work_size="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+    </p>
+    <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+    {{message}}
+</form>
+{% endblock %}

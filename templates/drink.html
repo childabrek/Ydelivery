@@ -4,17 +4,17 @@
 
 <!-- Кнопочки меню здесь -->
 <br>
-<a href="/" class="btn btn-warning">Пицца</a>
-<a href="drinks" class="btn btn-warning">Напитки</a>
-<a href="drinks" class="btn btn-warning">Комбо</a>
+<a href="/" class="btn btn-info">Пицца</a>
+<a href="drinks" class="btn btn-info">Напитки</a>
+<a href="drinks" class="btn btn-info">Комбо</a>
 <br>
 
 <!-- Название блока меню -->
-<h1>Пицца</h1>
+<h1>Напитки</h1>
 
 <!-- Позиции в меню -->
 <div class="cont">
-    {% for item in news%}
+    {% for item in dri%}
     <!-- одна позиция -->
     <div class="block">
         <!-- Название -->
@@ -26,7 +26,7 @@
         <div class="cont">
         <!-- Цена -->
         <h4>{{ item.price }} руб.  </h4>
-        <a href="/cart/1{{ item.id }}" class="btn btn-outline-warning">Добавить</a>
+        <a href="/cart/2{{ item.id }}" class="btn btn-outline-info">Добавить</a>
         </div>
     </div>
     {% endfor %}
