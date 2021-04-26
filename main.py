@@ -21,6 +21,7 @@ from data.cart import Cart
 import maps
 import cart_p
 
+# initializing
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 
@@ -54,6 +55,7 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
+        # проверка на совпадение
         user = db_sess.query(User).filter(User.email == form.email.data).first()
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
@@ -66,6 +68,7 @@ def login():
 
 @app.route("/")
 def index():
+    # основная страница
     db_sess = db_session.create_session()
     pizza = db_sess.query(Pizza)
     return render_template("index.html", news=pizza)
@@ -81,6 +84,7 @@ def drink():
 @app.route('/your_account', methods=['GET'])
 @login_required
 def account():
+
     db_sess = db_session.create_session()
     # получение ID текущего пользователя
     for i in db_sess.query(User).filter(User.id == int(current_user.get_id())):
@@ -100,6 +104,7 @@ def delete_cookie(valid):
 
 @app.route('/delete_cookie1/<valid>/<b>')
 def delete_cookie1(valid, b):
+    # старые элемент куки удаляем и сохраняем
     valid = valid.replace(f'{b}', '', 1).replace('!', ' ').lstrip()
     res = make_response(redirect('/cart'))
     res.set_cookie('menu_pos', valid, 60 * 60 * 24 * 15)
@@ -110,7 +115,9 @@ def delete_cookie1(valid, b):
 @login_required
 def add_pos(idt):
     db_sess = db_session.create_session()
+    # выбор продукта
     id_position = str(idt)[1::]
+    # выбор значения меню
     id_menu = str(idt)[0]
     # индекс значения выбора таблицы
     if int(id_menu) == 1:
@@ -139,6 +146,7 @@ def add_pos(idt):
 @app.route('/cart', methods=['GET', 'POST'])
 @login_required
 def cart_v():
+    # получение товаров из корзины переместил в отдельный класс
     a = cart_p.CartPost()
     result = a.cart_po()
     sum1 = a.sum_p()
@@ -149,30 +157,34 @@ def cart_v():
 def image(name):
     db_sess = db_session.create_session()
     a = 'Стерлитамак'
-
+    # соединяем значения из базы данных
     for i in db_sess.query(Blank).filter(Blank.name == name):
         a = a + ' ' + str(i.street) + ' ' + str(i.house)
         break
+    # создаем экземпляр класса
     ymap = maps.Maps(a)
+    # get image
     img = ymap.get_image()
+    # get distance
     dist = round(ymap.get_distance(), 1)
-
+    # get cost
     if dist <= 5:
         cost = 100
     elif dist <= 10:
         cost = 200
-
     return render_template('image.html', img=img, dist=dist, cost=cost)
 
 
 @app.route('/blankp', methods=['GET', 'POST'])
 def blank_post():
     form = BlankForm()
+    # форма отправки заявки на доставку
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         if db_sess.query(User).filter(User.name != form.name.data).first():
             return render_template('blank.html', form=form,
                                    message='Такого пользователя не существует')
+        # товары из корзины
         a = cart_p.CartPost()
         struct = a.cart_po()
         for i in struct:
