@@ -2,13 +2,12 @@
 import os
 
 from flask import Flask, render_template, redirect, request
-from flask import abort, session, url_for, make_response
+from flask import abort, make_response
 # flask_login
 from flask_login import LoginManager, login_user, login_required
 from flask_login import logout_user, current_user
 # forms
 from forms.user import RegisterForm, LoginForm
-from forms.news import NewsForm
 from forms.blank_post import BlankForm
 # data
 from data import db_session
@@ -17,7 +16,6 @@ from data.users import User
 from data.drinks import Drinks
 from data.combo import Combo
 from data.blank_posts import Blank
-from data.cart import Cart
 import maps
 import cart_p
 
@@ -37,9 +35,9 @@ def load_user(user_id):
 
 def main():
     db_session.global_init("db/blogs.db")
-    # port = int(os.environ.get("PORT", 5000))
-    # app.run(host='0.0.0.0', port=port)
-    app.run()
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
+    # app.run()
 
 
 @app.route('/logout')
@@ -84,7 +82,6 @@ def drink():
 @app.route('/your_account', methods=['GET'])
 @login_required
 def account():
-
     db_sess = db_session.create_session()
     # получение ID текущего пользователя
     for i in db_sess.query(User).filter(User.id == int(current_user.get_id())):
