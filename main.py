@@ -18,6 +18,8 @@ from data.drinks import Drinks
 from data.combo import Combo
 from data.blank_posts import Blank
 from data.cart import Cart
+import maps
+import cart_p
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -34,9 +36,9 @@ def load_user(user_id):
 
 def main():
     db_session.global_init("db/blogs.db")
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
-    # app.run()
+    # port = int(os.environ.get("PORT", 5000))
+    # app.run(host='0.0.0.0', port=port)
+    app.run()
 
 
 @app.route('/logout')
@@ -65,11 +67,6 @@ def login():
 @app.route("/")
 def index():
     db_sess = db_session.create_session()
-    # if current_user.is_authenticated:
-    #     pizza = db_sess.query(Pizza).filter(
-    #         (Pizza.user == current_user) | (Pizza.is_private != True))
-    # else:
-    #     pizza = db_sess.query(Pizza).filter(Pizza.is_private != True)
     pizza = db_sess.query(Pizza)
     return render_template("index.html", news=pizza)
 
@@ -93,37 +90,17 @@ def account():
 
 @app.route('/delete-cookie/<int:valid>')
 def delete_cookie(valid):
-    # индекс значения выбора таблицы
-    # if int(id_menu) == 1:
-    #     for i in db_sess.query(Pizza).filter(Pizza.id == int(id_position)):
-    #         posit = str(1) + str(i.id)
-    #     res = make_response(redirect('/'))
-    # elif int(id_menu) == 2:
-    #     for i in db_sess.query(Drinks).filter(Drinks.id == int(id_position)):
-    #         posit = str(2) + str(i.id)
-    #     res = make_response(redirect('/drinks'))
-    # elif int(id_menu) == 3:
-    #     for i in db_sess.query(Combo).filter(Combo.id == int(id_position)):
-    #         posit = str(3) + str(i.id)
-    #     res = make_response(redirect('/combo'))
-    # else:
-    #     abort(404)
+    # сохраняем и удаляем
     a = str(request.cookies.get('menu_pos', 0))
     a = a.replace(f' {valid}', '', 1).replace(' ', '!')
     res = make_response(redirect(f'/delete_cookie1/{a}/{valid}'))
     res.set_cookie('menu_pos', max_age=0)
-    # if not a:
-    #     res.set_cookie('menu_pos', str(posit), 60 * 60 * 24 * 15)
-    # else:
-    #     res.set_cookie('menu_pos', str(a) + ' ' + str(posit), 60 * 60 * 24 * 15)
     return res
 
 
 @app.route('/delete_cookie1/<valid>/<b>')
 def delete_cookie1(valid, b):
-    print(valid)
     valid = valid.replace(f'{b}', '', 1).replace('!', ' ').lstrip()
-    print(valid)
     res = make_response(redirect('/cart'))
     res.set_cookie('menu_pos', valid, 60 * 60 * 24 * 15)
     return res
@@ -135,8 +112,6 @@ def add_pos(idt):
     db_sess = db_session.create_session()
     id_position = str(idt)[1::]
     id_menu = str(idt)[0]
-    print('!!!!!!!!!!', id_menu)
-    print('!!!!!!!!!!', id_position)
     # индекс значения выбора таблицы
     if int(id_menu) == 1:
         for i in db_sess.query(Pizza).filter(Pizza.id == int(id_position)):
@@ -164,33 +139,30 @@ def add_pos(idt):
 @app.route('/cart', methods=['GET', 'POST'])
 @login_required
 def cart_v():
+    a = cart_p.CartPost()
+    result = a.cart_po()
+    sum1 = a.sum_p()
+    return render_template('cart.html', cart=result, summ=sum1)
+
+
+@app.route('/image/<name>')
+def image(name):
     db_sess = db_session.create_session()
-    a = str(request.cookies.get('menu_pos', 0)).split()
-    d = []
-    sum1 = 0
-    for j in a:
-        print(j)
-        if int(j[0]) == 1:
-            for i in db_sess.query(Pizza).filter(Pizza.id == j[1]):
-                i.id = int('1' + str(i.id))
-                d.append(i)
-                sum1 += i.price
-        elif int(j[0]) == 2:
-            for i in db_sess.query(Drinks).filter(Drinks.id == j[1]):
-                i.id = int('2' + str(i.id))
-                d.append(i)
-                sum1 += i.price
-        elif int(j[0]) == 3:
-            for i in db_sess.query(Combo).filter(Combo.id == j[1]):
-                i.id = int('3' + str(i.id))
-                d.append(i)
-                sum1 += i.price
-        else:
-            abort(404)
-    print(d)
-    print(sum1)
-    db_sess.close()
-    return render_template('cart.html', cart=d, summ=sum1)
+    a = 'Стерлитамак'
+
+    for i in db_sess.query(Blank).filter(Blank.name == name):
+        a = a + ' ' + str(i.street) + ' ' + str(i.house)
+        break
+    ymap = maps.Maps(a)
+    img = ymap.get_image()
+    dist = round(ymap.get_distance(), 1)
+
+    if dist <= 5:
+        cost = 100
+    elif dist <= 10:
+        cost = 200
+
+    return render_template('image.html', img=img, dist=dist, cost=cost)
 
 
 @app.route('/blankp', methods=['GET', 'POST'])
@@ -201,18 +173,22 @@ def blank_post():
         if db_sess.query(User).filter(User.name != form.name.data).first():
             return render_template('blank.html', form=form,
                                    message='Такого пользователя не существует')
-        print(str(form.name))
+        a = cart_p.CartPost()
+        struct = a.cart_po()
+        for i in struct:
+            answer = str(i.title), str(i.price)
+            print(i.title, i.price)
         posts = Blank(
             name=form.name.data,
             street=form.street.data,
-            structure='fds',
+            structure=str(answer),
             house=form.house.data,
             flat=form.flat.data,
             phone=form.phone.data
         )
         db_sess.add(posts)
         db_sess.commit()
-        return redirect('/')
+        return redirect(f'/image/{form.name.data}')
     return render_template('blank.html', form=form)
 
 
@@ -241,17 +217,3 @@ def reqister():
 
 if __name__ == '__main__':
     main()
-
-# @app.route('/news_delete/<int:id>', methods=['GET', 'POST'])
-# @login_required
-# def news_delete(id):
-#     db_sess = db_session.create_session()
-#     news = db_sess.query(Pizza).filter(Pizza.id == id,
-#                                        Pizza.user == current_user
-#                                        ).first()
-#     if news:
-#         db_sess.delete(news)
-#         db_sess.commit()
-#     else:
-#         abort(404)
-#     return redirect('/')
